@@ -7,3 +7,4 @@ tmp
 zig-out
 test
 example
+/target

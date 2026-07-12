@@ -3,6 +3,7 @@ const process = std.process;
 const heap = std.heap;
 const ansi = @import("ansi.zig");
 const Ansi = ansi.Ansi;
+const utils = @import("utils.zig");
 
 const cpu = @cImport({
     @cInclude("cpu.h");
@@ -18,10 +19,6 @@ const pci = @cImport({
 
 const system = @cImport({
     @cInclude("system.h");
-});
-
-const c = @cImport({
-    @cInclude("string.h"); // For strlen
 });
 
 pub fn main() !void {
@@ -63,41 +60,19 @@ fn printSystem(allocator: std.mem.Allocator, writer: WriterType) !void {
     var cinfo: system.SystemInfo = undefined;
     _ = system.get_system_info(&cinfo);
 
-    // Static 64 char string
-    const hostname_len = c.strlen(&cinfo.nodename);
-    const host_name: []const u8 = cinfo.nodename[0..hostname_len];
+    try writer.print("  {s}Host:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.nodename) });
 
-    try writer.print("  {s}Host:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, host_name });
+    try writer.print(" {s}Kernel:{s} {s} ", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.release) });
 
-    const release_len = c.strlen(&cinfo.release);
-    const release: []const u8 = cinfo.release[0..release_len];
+    try writer.print(" {s}Arch:{s} {s}\n", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.machine) });
 
-    try writer.print(" {s}Kernel:{s} {s} ", .{ Ansi.blue_bold_str, Ansi.reset, release });
+    try writer.print("  {s}compiler:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.compiler_name) });
 
-    const machine_len = c.strlen(&cinfo.machine);
-    const machine: []const u8 = cinfo.machine[0..machine_len];
+    try writer.print(" {s}clocksource:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.clc_current) });
 
-    try writer.print(" {s}Arch:{s} {s}\n", .{ Ansi.blue_bold_str, Ansi.reset, machine });
+    try writer.print(" {s}avail:{s} {s}\n", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.clc_avail) });
 
-    const compiler_len = c.strlen(&cinfo.compiler_name);
-    const compiler: []const u8 = cinfo.compiler_name[0..compiler_len];
-
-    try writer.print("  {s}compiler:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, compiler });
-
-    const clc_current_len = c.strlen(&cinfo.clc_current);
-    const clc_current: []const u8 = cinfo.clc_current[0..clc_current_len];
-
-    try writer.print(" {s}clocksource:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, clc_current });
-
-    const clc_avail_len = c.strlen(&cinfo.clc_avail);
-    const clc_avail: []const u8 = cinfo.clc_avail[0..clc_avail_len];
-
-    try writer.print(" {s}avail:{s} {s}\n", .{ Ansi.blue_bold_str, Ansi.reset, clc_avail });
-
-    const params_len = c.strlen(&cinfo.params);
-    const params: []const u8 = cinfo.params[0..params_len];
-
-    try writer.print("  {s}parameters:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, params });
+    try writer.print("  {s}parameters:{s} {s}", .{ Ansi.blue_bold_str, Ansi.reset, utils.nullTerminateCString(&cinfo.params) });
     return;
 }
 
