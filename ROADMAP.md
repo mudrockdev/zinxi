@@ -16,107 +16,125 @@ Legend maps each section to its inxi flag, e.g. Graphics = `inxi -G`.
 - [x] Host (nodename)
 - [x] Kernel (release)
 - [x] Arch (machine)
-- [x] Compiler
+- [x] Kernel bits (32/64)
+- [x] Compiler + version
 - [x] Clocksource (current)
 - [x] Available clocksources
 - [x] Boot parameters (`/proc/cmdline`)
-- [ ] Kernel bits (32/64)
-- [ ] Distro (`/etc/os-release`)
-- [ ] Desktop environment + version
+- [x] Distro (`/etc/os-release`)
+- [x] Display manager (dm)
+- [~] Desktop environment (name from `XDG_CURRENT_DESKTOP`; version not detected)
 - [ ] Window manager / compositor
+- [ ] Toolkit (tk)
 - [ ] Console / tty vs display
 
 ## Machine — `inxi -M`
-- [ ] Type (laptop / desktop / server, from DMI chassis)
-- [ ] System vendor / product / version (`/sys/class/dmi/id/`)
-- [ ] Motherboard vendor / model
-- [ ] BIOS/UEFI vendor / version / date
-- [ ] Serial (behind a filter flag)
+- [x] Type (chassis type from DMI)
+- [x] Motherboard vendor / model / version
+- [x] BIOS/UEFI vendor / version / date
+- [~] Serial (needs root — prints `<superuser required>`)
+- [ ] System (OEM product/version, for prebuilt/laptops)
 
 ## Battery — `inxi -B`
-- [ ] Detect batteries (`/sys/class/power_supply/BAT*`)
-- [ ] Charge (now / full / percent)
+- [~] Detect batteries (skips cleanly when none; **unverified** — no battery on
+      this machine to confirm field output)
+- [~] Charge / volts / model / status (coded, not yet observed working)
 - [ ] Condition (full-capacity vs design)
-- [ ] Volts, model, status, cycles
+- [ ] Cycles
 
 ## CPU — `inxi -C`
-- [x] Model (brand string)
-- [x] Vendor (AMD / Intel abbreviation)
+- [x] Model (brand string, cleaned)
 - [x] Cores
 - [x] Threads (logical CPUs)
-- [x] Stepping
-- [x] Model ID (dec + hex)
+- [x] Bits
+- [x] Type (MT / MCP)
 - [x] Family (dec + hex)
-- [ ] Socket / bits / type (MT/MCP)
-- [ ] Microcode revision
-- [ ] Cache (L1 / L2 / L3)
-- [ ] Speed: avg / min / max (`/sys/.../cpufreq` or `/proc/cpuinfo` MHz)
-- [ ] Per-core current speed
+- [x] Model ID (dec + hex)
+- [x] Stepping
+- [x] Microcode revision
+- [x] Cache (L1 / L2 / L3)
+- [x] Speed: avg / min / max
+- [x] Per-core current speed
+- [x] Bogomips
+- [~] Flags (basic subset shown; full `inxi -f` list not)
+- [ ] Socket
+- [ ] Arch label (e.g. "Zen 3+")
 - [ ] Governor / scaling driver
-- [ ] Bogomips
-- [ ] Flags / features (`inxi -f`)
+- [ ] Boost enabled/disabled
 
 ## Graphics — `inxi -G`
 - [x] Device name
 - [x] Device vendor
-- [~] Driver (currently hardcoded "Unknown"; read from `/sys/.../uevent`)
-- [~] Driver version (unavailable without OpenCL/OpenGL query)
-- [ ] Bus ID
-- [ ] Multiple GPUs (Device-2, Device-3, …)
-- [ ] Display server (X11 / Wayland) + compositor
+- [x] Driver (real DRM driver from sysfs)
+- [x] Bus ID
+- [x] Chip ID
+- [x] Multiple GPUs (Device-2, Device-3, …)
+- [~] Display server (session type only; no X.org/compositor/version)
 - [ ] Resolution
 - [ ] API: OpenGL / EGL / Vulkan renderer + version
 - [ ] Monitor / EDID (`inxi --edid`)
 
 ## Audio — `inxi -A`
-- [ ] Device name / vendor
-- [ ] Driver + bus ID
-- [ ] Sound server (ALSA / PipeWire / PulseAudio) + version
+- [x] Device name / vendor
+- [x] Driver + bus ID + chip ID
+- [x] Sound server (PipeWire / PulseAudio) + version
+- [ ] Multiple servers with sub-status (pipewire-pulse, wireplumber, …)
 
 ## Network — `inxi -N`
-- [x] Device (lspci name)
+- [x] Device (PCI name / vendor)
+- [x] Driver / bus ID / chip ID
 - [x] Interface name (IF-N)
-- [x] MAC address
+- [x] Interface state (up/down/unknown)
+- [x] Link speed
+- [x] MAC address (with `-z` filter)
 - [x] Active services (NetworkManager / sshd)
-- [~] Interface state (up/down — parse currently misses it, see main.rs)
-- [ ] Driver / port / bus ID per device
-- [ ] Link speed / duplex
+- [ ] Duplex
+- [ ] Port
 - [ ] IP addresses per interface (`inxi -i`)
 - [ ] WAN IP (`inxi -i`)
 
 ## Drives — `inxi -D`
-- [ ] Local storage total / used
-- [ ] Per-drive ID (dev, vendor, model, size)
-- [ ] Serial, speed, temp
+- [x] Local storage total / used
+- [x] Per-drive ID (dev, vendor, model, size)
+- [ ] Serial (root/smartctl)
+- [ ] Speed / lanes (NVMe/SATA)
+- [ ] Temperature (hwmon/nvme)
 - [ ] SMART status
 - [ ] Optical drives (`inxi -d`)
 
 ## Partitions — `inxi -P`
-- [ ] Mounted partitions (`/proc/mounts` + statvfs)
-- [ ] Mount / size / used / percent / fs / dev
+- [x] Notable mounts (`/`, `/boot`, `/home`, …)
+- [x] Mount / size / used / percent / fs / dev
 - [ ] Labels (`inxi -l`) and UUIDs (`inxi -u`)
 - [ ] Unmounted partitions (`inxi -o`)
+- [ ] Full mounted list (`inxi -p`)
 
 ## Swap — `inxi -j`
-- [ ] Swap entries (`/proc/swaps`)
-- [ ] Type / size / used / percent / priority / device
+- [x] Swap entries (`/proc/swaps`)
+- [x] Type / size / used / percent / priority / device
 
 ## Sensors — `inxi -s`
-- [ ] CPU / mobo / GPU temperatures (`/sys/class/hwmon`)
-- [ ] Fan speeds
+- [x] CPU temperature (`/sys/class/hwmon`)
+- [x] Fan speeds
+- [~] Motherboard temp (best effort; often N/A without driver)
+- [ ] GPU temperature line
 
 ## Memory / RAM — `inxi -m`
-- [ ] Total / available / used (`/proc/meminfo`)
-- [ ] Per-slot modules (DMI type 17)
+- [x] Total / available / used (shown in Info line)
+- [ ] Standalone `-m` section
+- [ ] Per-slot modules (DMI type 17, needs root)
 
 ## Info — `inxi -I`
-- [ ] Process count
-- [ ] Uptime (`/proc/uptime`)
-- [ ] Memory summary (total / used)
-- [ ] Init system + runlevel
-- [ ] Installed package count
-- [ ] Default shell
-- [ ] zinxi version / client
+- [x] Process count
+- [x] Uptime (`/proc/uptime`)
+- [x] Memory summary (total / available / used)
+- [x] Init system + version + default target
+- [x] Package count (rpm / dpkg / pacman)
+- [x] Compilers (gcc / clang)
+- [x] Default shell (parent process)
+- [x] zinxi version
+- [ ] Flatpak / snap package counts
+- [ ] Client detection
 
 ---
 
@@ -130,10 +148,13 @@ Legend maps each section to its inxi flag, e.g. Graphics = `inxi -G`.
 - [ ] Weather — `inxi -w`
 
 ## CLI & infrastructure
-- [ ] Argument parsing (per-section flags: `-S -C -G …`)
+- [~] Argument parsing (only `-z`, `--no-host`, `--help`; no per-section flags)
+- [x] `--help`
+- [x] `-z` / `--filter` (filters host + MAC)
+- [ ] Per-section flags (`-S -C -G …`) and `-F` selection
 - [ ] Verbosity levels `-v0`..`-v8`
-- [ ] `-F` full report as default
+- [ ] `--version`
 - [ ] Color control (`-c`, `--no-color`, respect `NO_COLOR`)
-- [ ] Output when not a TTY (strip ANSI)
-- [ ] Filtering of serials/MACs/IPs (`-z`)
-- [ ] `--help` / `--version`
+- [ ] Strip ANSI when output is not a TTY
+- [ ] Filter serials / IPs (extend `-z`)
+- [ ] inxi-exact line wrapping at terminal width

@@ -65,3 +65,7 @@ pub const YELLOW_BOLD: &str = "\x1b[33m\x1b[1m";
 pub const RED_BOLD: &str = "\x1b[31m\x1b[1m";
 pub const CYAN_BOLD: &str = "\x1b[36m\x1b[1m";
 pub const MAGENTA_BOLD: &str = "\x1b[35m\x1b[1m";
+
+// Semantic roles used across sections (inxi-like: bold section headers, colored keys).
+pub const HEADER: &str = "\x1b[34m\x1b[1m"; // section headers, e.g. "System:"
+pub const KEY: &str = "\x1b[36m\x1b[1m"; // field keys, e.g. "Kernel"
